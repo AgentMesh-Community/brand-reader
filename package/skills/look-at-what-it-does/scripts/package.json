@@ -1,0 +1,9 @@
+{
+  "name": "brand-reader-scripts",
+  "private": true,
+  "type": "module",
+  "description": "What the brand-reader scripts need on a host: the browser driver, driven against the chromium the host provides. Only observe.mjs uses it, and only to look at what the pages render; fetching, reading the statements, writing the profile and filing the pieces are node built-ins.",
+  "dependencies": {
+    "playwright-core": "1.63.0"
+  }
+}

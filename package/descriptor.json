@@ -1,0 +1,307 @@
+{
+  "format": "agent-descriptor-v1",
+  "agent_version": "0.1.0",
+  "does": "Reads a brand from a domain into a draft brand profile: only what the site states about itself goes in the profile, what it was merely observed doing is reported beside it, and every value says where it was seen. The two values no site declares, which of its colors is the primary and which is the accent, are chosen by a model that is shown a picture of the home page and may only answer with a color the pages declare, and the profile says so on the value.",
+  "offerings": [
+    {
+      "id": "read-a-brand",
+      "name": "Read a brand",
+      "does": "Turns a domain into a draft brand profile the owner can correct and adopt, with the evidence for every value.",
+      "inputs": [
+        {
+          "name": "domain",
+          "kind": "url",
+          "required": true
+        },
+        {
+          "name": "how many pages",
+          "kind": "identifier",
+          "required": false
+        }
+      ],
+      "outputs": [
+        {
+          "name": "brand profile",
+          "kind": "application/json",
+          "when": "per_task"
+        },
+        {
+          "name": "brand report",
+          "kind": "text",
+          "when": "per_task"
+        }
+      ],
+      "how": {
+        "control": "script",
+        "intelligence": "called",
+        "cost": "metered",
+        "contract": "full"
+      },
+      "steps": [
+        {
+          "id": "fetch-the-site",
+          "name": "Fetch the site",
+          "does": "Fetches the home page, the pages it links to on the same host, the web app manifest and the stylesheets, under a ceiling on each and on all of them together.",
+          "inputs": [
+            {
+              "name": "domain",
+              "kind": "url",
+              "required": true
+            },
+            {
+              "name": "how many pages",
+              "kind": "identifier",
+              "required": false
+            }
+          ],
+          "outputs": [
+            {
+              "name": "fetched",
+              "kind": "application/json",
+              "when": "per_task"
+            }
+          ],
+          "how": {
+            "control": "script",
+            "intelligence": "none",
+            "cost": "none",
+            "contract": "full"
+          }
+        },
+        {
+          "id": "read-what-it-states",
+          "name": "Read what it states",
+          "does": "Collects the things the site says about itself, each with the place it was said.",
+          "inputs": [
+            {
+              "name": "fetched",
+              "kind": "application/json",
+              "required": true
+            }
+          ],
+          "outputs": [
+            {
+              "name": "statements",
+              "kind": "application/json",
+              "when": "per_task"
+            }
+          ],
+          "how": {
+            "control": "script",
+            "intelligence": "none",
+            "cost": "none",
+            "contract": "full"
+          }
+        },
+        {
+          "id": "look-at-what-it-does",
+          "name": "Look at what it does",
+          "does": "Opens the pages in a browser and reads the five colors and the two font stacks a site sets on its own elements, which are statements, and what the pages render, which is reported and never written into the profile.",
+          "inputs": [
+            {
+              "name": "fetched",
+              "kind": "application/json",
+              "required": true
+            },
+            {
+              "name": "statements",
+              "kind": "application/json",
+              "required": true
+            }
+          ],
+          "outputs": [
+            {
+              "name": "observations",
+              "kind": "application/json",
+              "when": "per_task"
+            }
+          ],
+          "how": {
+            "control": "script",
+            "intelligence": "none",
+            "cost": "none",
+            "contract": "full"
+          }
+        },
+        {
+          "id": "choose-the-roles",
+          "name": "Choose the roles",
+          "does": "Shows a model the home page and the colors the pages declare, and asks which of those is the primary and which is the accent.",
+          "inputs": [
+            {
+              "name": "statements",
+              "kind": "application/json",
+              "required": true
+            },
+            {
+              "name": "observations",
+              "kind": "application/json",
+              "required": false
+            }
+          ],
+          "outputs": [
+            {
+              "name": "roles",
+              "kind": "application/json",
+              "when": "per_task"
+            }
+          ],
+          "how": {
+            "control": "script",
+            "intelligence": "called",
+            "cost": "metered",
+            "contract": "ends"
+          }
+        },
+        {
+          "id": "write-the-profile",
+          "name": "Write the profile",
+          "does": "Writes the draft profile from the statements and the report from everything else.",
+          "inputs": [
+            {
+              "name": "statements",
+              "kind": "application/json",
+              "required": true
+            },
+            {
+              "name": "observations",
+              "kind": "application/json",
+              "required": false
+            },
+            {
+              "name": "roles",
+              "kind": "application/json",
+              "required": false
+            }
+          ],
+          "outputs": [
+            {
+              "name": "brand profile",
+              "kind": "application/json",
+              "when": "per_task"
+            },
+            {
+              "name": "brand report",
+              "kind": "text",
+              "when": "per_task"
+            }
+          ],
+          "how": {
+            "control": "script",
+            "intelligence": "none",
+            "cost": "none",
+            "contract": "full"
+          }
+        }
+      ],
+      "revisions": {
+        "included": {
+          "count": 1,
+          "window_days": 14
+        },
+        "steps": [
+          {
+            "id": "fetch-the-site",
+            "price": {
+              "model": "flat",
+              "amount_micro": 300000,
+              "currency": "USD"
+            }
+          },
+          {
+            "id": "read-what-it-states",
+            "price": {
+              "model": "flat",
+              "amount_micro": 300000,
+              "currency": "USD"
+            }
+          },
+          {
+            "id": "look-at-what-it-does",
+            "price": {
+              "model": "flat",
+              "amount_micro": 400000,
+              "currency": "USD"
+            }
+          },
+          {
+            "id": "choose-the-roles",
+            "price": {
+              "model": "flat",
+              "amount_micro": 300000,
+              "currency": "USD"
+            }
+          },
+          {
+            "id": "write-the-profile",
+            "price": {
+              "model": "flat",
+              "amount_micro": 200000,
+              "currency": "USD"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "refusals": "Putting anything in the profile the site did not state about itself, with one named exception. A color sampled out of an image, a face guessed from how a heading looks, a primary color chosen because it appears most often, and a favicon used as the mark are all guesses, and a guessed brand is worse than a silent one because it is handed to other agents as though the owner had said it. The exception is which of the colors the site DECLARES is its primary and which is its accent, which a model chooses from that list and never supplies itself; the value was still read off an element exactly, the evidence says a model placed it, and none is an answer the choosing makes easy to give.\nReading a value off a picture. The step that chooses the roles is shown a screenshot of the home page to judge which of the declared colors carries it, and it may answer only with one of those colors or with none. A hex read off a picture has been through antialiasing, an overlay and a gradient, and naming a face from the shape of its letters is not possible at all, so every exact value in the profile is read off the DOM. Vision is for salience only.\nMaking a brand decision for the owner. Which of four blues is the primary one is an assignment nobody publishes, and choosing one is not this agent's to do. Where the pages differ about the SAME PLACE, the draft carries the value more of them state and the report names the minority, the counts and which pages stated which, because a count of the owner's own statements is evidence and not a preference; where no value is stated by more pages than another it carries neither.\nFollowing a link off the domain it was given, fetching anything that is not https, or fetching an address carrying a credential.\nSigning the profile, calling it finished, or publishing it anywhere. What comes out is a draft, and it becomes a profile when the owner corrects it and adopts it.",
+  "escalates": [
+    "A domain that will not answer, or answers with something that is not a web page, goes back to the person with what happened.",
+    "A site that states nothing about itself goes back with the report alone and no profile, naming which parts were looked for.",
+    "The parts of a brand that no website carries, the narration voice, the words the brand will not say, and the things that must never be done to the mark, are named in the report for a person to type, because no amount of reading a site will produce them."
+  ],
+  "records": [
+    {
+      "name": "the domain as given, and when it was asked for",
+      "when": "per_task",
+      "file": "*/asked.json"
+    },
+    {
+      "name": "every page, stylesheet and manifest as fetched, with its address, the moment it was fetched and its digest",
+      "when": "per_task",
+      "file": "*/fetched/*"
+    },
+    {
+      "name": "the statements found, each with the address and the place it was said",
+      "when": "per_task",
+      "file": "*/statements.json"
+    },
+    {
+      "name": "the observations, with the counts behind each one",
+      "when": "per_task",
+      "file": "*/observations.json"
+    },
+    {
+      "name": "the picture of the home page the roles were chosen from, as the browser rendered it",
+      "when": "per_task",
+      "file": "*/home-page.png"
+    },
+    {
+      "name": "the roles as chosen: every color that was offered, which of them was named the primary and which the accent, how many calls it took, and the reason where neither was chosen",
+      "when": "per_task",
+      "file": "*/roles.json"
+    },
+    {
+      "name": "the draft profile as delivered",
+      "when": "per_task",
+      "file": "*/brand-profile.json"
+    },
+    {
+      "name": "the signed job manifest of each delivery, listing each piece by the step that made it. The adapter signs it from pieces.json and keeps it beside the reply.",
+      "when": "per_task"
+    }
+  ],
+  "systems": [
+    {
+      "name": "source-host",
+      "access": "read",
+      "needs": "to fetch the pages, the web app manifest and the stylesheets at the domain the person named, over https, and to open those pages in the browser"
+    },
+    {
+      "name": "text-reasoning",
+      "access": "trigger",
+      "needs": "to choose which of the colors the pages declare is the primary and which is the accent, which is the one judgment in this job that no written rule reaches",
+      "leaves": true
+    }
+  ]
+}

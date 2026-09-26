@@ -1,0 +1,34 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "brand-reader",
+  "version": "0.1.0",
+  "description": "Reads a brand from a domain into a draft brand profile: only what the site states about itself goes in the profile, what it was merely observed doing is reported beside it, and every value says where it was seen. The two values no site declares, which of its colors is the primary and which is the accent, are chosen by a model that is shown a picture of the home page and may only answer with a color the pages declare, and the profile says so on the value.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Agent Builder"
+  },
+  "keywords": [
+    "built-agent",
+    "draft",
+    "read-a-brand",
+    "fetch-the-site",
+    "read-what-it-states",
+    "look-at-what-it-does",
+    "choose-the-roles",
+    "write-the-profile"
+  ],
+  "extensions": {
+    "net.agentdoc.package": {
+      "descriptor": {
+        "path": "descriptor.json",
+        "sha256": "813fbf9cbe7aa35af3da261ba9a36c875b37f7d39f107f71f01d1c808e56ccda"
+      },
+      "install": {
+        "path": "install.json",
+        "sha256": "bc4c0d80f1285da4b7c497bc19c7e5b430645fee6fbf07dd4b4dad9e8dcf4c8d"
+      },
+      "built": true,
+      "draft": true
+    }
+  }
+}
